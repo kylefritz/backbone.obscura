@@ -645,9 +645,10 @@
                     }
                 }
             }
-            function onAdd(model) {
+            function onAdd(model, collection, options) {
                 var index = modelInsertIndex.call(this, model);
-                this._collection.add(model, { at: index });
+                var silent = !!options.silent;
+                this._collection.add(model, { at: index, silent: silent });
             }
             function onRemove(model) {
                 if (this.contains(model)) {
@@ -656,8 +657,9 @@
             }
             function onChange(model) {
                 if (this.contains(model) && this._collection.indexOf(model) !== modelInsertIndex.call(this, model)) {
-                    this._collection.remove(model);
-                    onAdd.call(this, model);
+                    this._collection.remove(model, { silent: true });
+                    onAdd.call(this, model, this._superset, { silent: true });
+                    this._collection.trigger('sort', this._collection);
                 }
             }
             function sort() {
